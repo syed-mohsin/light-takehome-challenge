@@ -2,7 +2,7 @@
 
 Light take-home challenge, option 1. A TanStack Start + React + TypeScript foundation for a residential electricity dashboard, configured for Vercel with Nitro.
 
-**Current state:** starter page, server health endpoint, formatting/type checks, and deployment setup. Energy parsing, charts, onboarding, simulations, and AI insights are the next phase. Challenge CSVs and their detailed analysis are kept locally and excluded from the public repository.
+**Current state:** starter page, server health endpoint, supplied challenge CSVs, formatting/type checks, and deployment setup. Energy parsing, charts, onboarding, simulations, and AI insights are the next phase.
 
 ## Run locally
 
@@ -51,8 +51,8 @@ References: [TanStack hosting](https://tanstack.com/start/latest/docs/framework/
 ## Project layout
 
 ```text
-data/README.md         How to add the challenge fixtures locally
-data/raw/              Local CSV fixtures (gitignored; not public web assets)
+data/raw/              Supplied interval CSV fixtures (not public web assets)
+docs/data-notes.md      Verified data profile and proposed processing approach
 src/routes/            File-based pages and server endpoints
 src/router.tsx         Router setup
 src/styles.css         Base styles
@@ -60,6 +60,6 @@ vite.config.ts         TanStack Start, React, and Nitro integration
 vercel.json            Vercel framework configuration
 ```
 
-Follow [fixture setup](data/README.md) to add the supplied CSVs to a new clone. Their `consumption` and `generation` columns contain **Wh per 15-minute interval**; divide by 1,000 for kWh. The proposed cost view uses the brief's flat **$0.14/kWh**, excluding taxes, fees, and any assumed export credit. No runtime data pipeline or LLM provider is configured yet. The starter builds and deploys without fixtures.
+The supplied CSVs are included unchanged in `data/raw/`. Their `consumption` and `generation` columns contain **Wh per 15-minute interval**; divide by 1,000 for kWh. The proposed cost view uses the brief's flat **$0.14/kWh**, excluding taxes, fees, and any assumed export credit. No runtime data pipeline or LLM provider is configured yet.
 
-The original local checkout also contains a gitignored `docs/data-notes.md` with coverage, reproducible insights, timezone/meter caveats, and the proposed aggregation approach.
+See [data notes](docs/data-notes.md) for coverage, reproducible insights, timezone/meter caveats, and the proposed aggregation approach.

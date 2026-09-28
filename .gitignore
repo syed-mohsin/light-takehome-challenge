@@ -14,5 +14,3 @@ dist-ssr
 .vinxi
 __unconfig*
 *.tsbuildinfo
-data/raw/*.csv
-docs/data-notes.md
