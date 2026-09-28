@@ -1,6 +1,7 @@
 import {
   CalendarDays,
   Check,
+  ChevronDown,
   House,
   Leaf,
   PiggyBank,
@@ -109,19 +110,25 @@ export function DashboardContainer({
       <label className="sr-only" htmlFor="household-select">
         Sample household
       </label>
-      <select
-        id="household-select"
-        value={search.household}
-        onChange={(event) => selectHousehold(event.target.value as DatasetId)}
-        className="h-11 max-w-full rounded-lg border border-line bg-surface px-3 text-xs font-medium text-ink"
-        disabled={pending}
-      >
-        {(Object.keys(DATASET_LABELS) as DatasetId[]).map((household) => (
-          <option value={household} key={household}>
-            {DATASET_LABELS[household]}
-          </option>
-        ))}
-      </select>
+      <div className="relative max-w-full">
+        <select
+          id="household-select"
+          value={search.household}
+          onChange={(event) => selectHousehold(event.target.value as DatasetId)}
+          className="h-11 max-w-full appearance-none rounded-lg border border-line bg-surface py-0 pr-9 pl-3 text-xs font-medium text-ink"
+          disabled={pending}
+        >
+          {(Object.keys(DATASET_LABELS) as DatasetId[]).map((household) => (
+            <option value={household} key={household}>
+              {DATASET_LABELS[household]}
+            </option>
+          ))}
+        </select>
+        <ChevronDown
+          aria-hidden="true"
+          className="pointer-events-none absolute top-1/2 right-3 size-3.5 -translate-y-1/2 text-muted"
+        />
+      </div>
       <PeriodPicker
         key={`${search.household}:${search.start}:${search.end}`}
         period={search}
