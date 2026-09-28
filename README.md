@@ -2,7 +2,7 @@
 
 Light take-home challenge, option 1: an electricity dashboard built with TanStack Start, React, TypeScript, Tailwind, and Recharts. Explore three supplied households, understand their historical usage, and try an evening-reduction scenario.
 
-The five implementation plans are implemented. The app works without API credentials or a database. Lint, TypeScript, the focused data tests, standalone/Vercel production builds, and manual browser smoke checks have passed. A hosted Vercel project has not been provisioned, and no paid Luna request has been verified without an API key.
+The five implementation plans are implemented. The app works without API credentials or a database. Lint, TypeScript, the focused data tests, standalone/Vercel production builds, and manual browser smoke checks have passed. Live local Luna explanations and browser-cache reuse have been verified with an API key. A hosted deployment has not been verified here.
 
 ## Run locally
 
@@ -23,7 +23,7 @@ Open [localhost:3000](http://localhost:3000). Development automatically validate
 - See recorded consumption, estimated cost, daily average, peak day, and deterministic insights with supporting evidence.
 - Reduce consumption during 5–9 PM by 0–30% and compare the scenario against recorded usage. Calculations update locally without a request for every slider movement.
 - Choose Saving money, Carbon footprint, or Learning. Saving money is the default; a small localStorage record remembers the choice and onboarding status.
-- Request an optional Luna explanation of verified facts. Matching successful explanations are reused from localStorage; the dashboard remains useful if AI is disabled or unavailable.
+- Request an optional Luna explanation of verified facts, including an everyday comparison to EV batteries or LED bulbs. Matching successful explanations are reused from localStorage; the dashboard remains useful if AI is disabled or unavailable.
 
 ## Optional AI explanations
 
@@ -38,6 +38,8 @@ Restart the development server after changing these settings. The server uses **
 
 The **Explain these patterns** action checks saved results before requesting an explanation. There are no model calls on page load, priority changes, or slider movements. The server recomputes the facts from its own data, validates output shape and evidence references, and returns deterministic text on missing configuration, timeout, or invalid output. Schema validation does not prove that all model-authored prose is factually correct; review live output before a demo.
 
+**Energy in everyday terms** compares average complete-day consumption with a 60 kWh EV battery or 10 W LED bulbs running for 24 hours. With positive scenario savings, it instead compares the saved energy across the selected period with EV batteries. The backend calculates these equivalents; Luna selects an eligible comparison and writes a sentence around a required placeholder. Application code inserts the verified quantity and units, with explicit scope and a **How we calculated this** disclosure. EV comparisons exclude charging losses. Partial days are excluded from daily averages; savings use only the actual selected period, without annualizing.
+
 Browser storage holds one preference record and at most ten successful explanations. Explanation keys include dataset/version, dates, priority, scenario, carbon assumption, and explanation version. Display units and chart granularity do not invalidate an explanation. Storage is best-effort, local to the browser, and has no account synchronization or shared spending limit. There is **no Redis, database, or server result cache**.
 
 ## Validate and build
@@ -49,9 +51,11 @@ npm test
 npm run build:vercel
 ```
 
-`npm test` runs eight focused `node:test` checks through `tsx` in approximately one second. They cover strict CSV validation, real-fixture totals, offset changes, daily/weekly reconciliation, period validation, pricing, simulation invariants, and deterministic versions. Browser interactions are reviewed manually; no heavy UI test suite is installed.
+`npm test` runs fifteen focused `node:test` checks through `tsx` in approximately one to two seconds. They cover strict CSV validation, real-fixture totals, offset changes, daily/weekly reconciliation, period validation, pricing, simulation invariants, deterministic versions, analogy calculations, and invalid model wording. Browser interactions are reviewed manually; no heavy UI test suite is installed.
 
 Manual browser checks covered desktop and 360px mobile layouts, saved priority after reload, daily/weekly scenario retention, household reset behavior, solar/dollar handling, typical-day charts, keyboard slider controls, explicit carbon assumptions, custom dates and partial-week tables, invalid-URL recovery, and the AI-disabled fallback. The standalone production server also loaded the chart and switched households successfully without browser errors.
+
+Live Luna checks also covered the daily LED analogy (about 227 bulbs for 24 hours), the 20% evening-reduction analogy (about 17.76 full 60 kWh EV batteries across the default selected year), calculation disclosures, reload reuse, context switching, and the analogy panel at 360px without horizontal overflow.
 
 Data generation runs automatically before development, type checking, tests, and builds, including on a fresh clone. To run it alone, use `npm run data:build`. `npm run format` applies formatting. GitHub Actions runs checks, type checking, these fast tests, and the Vercel build.
 
