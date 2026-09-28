@@ -39,7 +39,7 @@ export const DashboardSearchSchema = z
     household: DatasetIdSchema.default(DEFAULT_HOUSEHOLD),
     start: DateSchema.default(DEFAULT_PERIOD.start),
     end: DateSchema.default(DEFAULT_PERIOD.end),
-    granularity: z.enum(['daily', 'weekly']).default('daily'),
+    granularity: z.enum(['daily', 'weekly']).default('weekly'),
     unit: z.enum(['kWh', 'usd']).default('kWh'),
   })
   .refine(
