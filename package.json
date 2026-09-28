@@ -6,14 +6,19 @@
     "#/*": "./src/*"
   },
   "scripts": {
+    "data:build": "node --import tsx scripts/build-energy-data.ts",
+    "predev": "npm run data:build",
     "dev": "vite dev --port 3000",
     "generate-routes": "tsr generate",
+    "prebuild": "npm run data:build",
     "build": "vite build",
     "preview": "vite preview",
     "format": "biome format --write .",
     "lint": "biome lint .",
     "check": "biome check .",
+    "pretypecheck": "npm run data:build",
     "typecheck": "npm run generate-routes && tsc --noEmit",
+    "test": "node --import tsx --test scripts/energy.test.ts",
     "build:vercel": "NITRO_PRESET=vercel npm run build",
     "start": "node .output/server/index.mjs"
   },

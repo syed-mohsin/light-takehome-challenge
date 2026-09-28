@@ -1,48 +1,76 @@
-:root {
-  color: #183b32;
-  background: #f7f8f2;
-  font-family: system-ui, sans-serif;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
+@import "tailwindcss";
+
+@theme static {
+  --color-canvas: #f5f8f7;
+  --color-surface: #ffffff;
+  --color-ink: #20323a;
+  --color-muted: #5c6e76;
+  --color-subtle: #6b7e86;
+  --color-line: #e1e9e6;
+  --color-control-line: #73858d;
+  --color-banner: #20323a;
+  --color-on-banner: #f8fafa;
+  --color-accent: #f59e0b;
+  --color-accent-ink: #8a4800;
+  --color-accent-soft: #fff5e5;
+  --color-positive: #2e704a;
+  --color-positive-soft: #eef7f0;
+  --color-danger: #b42318;
+  --color-focus: #215e89;
+  --color-consumption: #a85700;
+  --color-scenario: #356a91;
+  --color-generation: #2e704a;
+  --radius-control: 0.5rem;
+  --radius-card: 0.875rem;
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --shadow-card: 0 2px 5px rgb(32 50 58 / 2%);
 }
 
-* {
-  box-sizing: border-box;
+@layer base {
+  :root {
+    color: var(--color-ink);
+    background: var(--color-canvas);
+    font-family: var(--font-sans);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+  }
+
+  button,
+  input,
+  select {
+    font: inherit;
+  }
+
+  button:not(:disabled),
+  select:not(:disabled),
+  input[type="range"]:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 4px;
+  }
+
+  ::selection {
+    color: var(--color-ink);
+    background: #ffdc9a;
+  }
 }
 
-body {
-  margin: 0;
-}
-
-main {
-  width: min(48rem, calc(100% - 3rem));
-  margin: clamp(4rem, 15vh, 10rem) auto;
-}
-
-.eyebrow {
-  font-size: 0.8rem;
-  font-weight: 650;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-h1 {
-  margin: 1rem 0;
-  font-size: clamp(2.75rem, 8vw, 5rem);
-  font-weight: 550;
-  letter-spacing: -0.055em;
-  line-height: 1.05;
-}
-
-p {
-  font-size: 1.125rem;
-  line-height: 1.6;
-}
-
-.status {
-  margin-top: 3rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid #ced8cf;
-  color: #52685e;
-  font-size: 0.9rem;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms;
+    transition-duration: 0.01ms;
+    scroll-behavior: auto;
+  }
 }
