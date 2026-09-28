@@ -63,3 +63,7 @@ vercel.json            Vercel framework configuration
 The supplied CSVs are included unchanged in `data/raw/`. Their `consumption` and `generation` columns contain **Wh per 15-minute interval**; divide by 1,000 for kWh. The proposed cost view uses the brief's flat **$0.14/kWh**, excluding taxes, fees, and any assumed export credit. No runtime data pipeline or LLM provider is configured yet.
 
 See [data notes](docs/data-notes.md) for coverage, reproducible insights, timezone/meter caveats, and the proposed aggregation approach.
+
+## Implementation plans
+
+The [plan index](plans/README.md) links the design system, CSV pipeline, onboarding, charting/simulations, and insights/LLM plans, with shared contracts and implementation order. These describe upcoming work; the application currently contains the starter described above.
