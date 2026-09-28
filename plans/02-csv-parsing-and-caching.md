@@ -1,12 +1,12 @@
 # 02 — CSV parsing and caching
 
-Status: proposed implementation. Depends on the shared decisions in [README](README.md); supplies [charts](04-charting-and-simulations.md) and [insights](05-insights-and-llm.md).
+Status: implemented design record. Depends on the shared decisions in [README](README.md); supplies [charts](04-charting-and-simulations.md) and [insights](05-insights-and-llm.md). All 202,176 source intervals validate; eight focused Node tests pass in about one second. The largest measured 366-day response is approximately 61 KB gzip.
 
 ## Outcome and scope
 
 Turn the three checked-in CSV fixtures into validated, reproducible data artifacts before deployment. Serve only the selected household and reporting window to the browser, with enough detail for immediate local simulation. No database, uploads, runtime CSV parsing, or persistent cache service is needed for this fixed dataset.
 
-The current scaffold has TanStack Start, React, TypeScript, Nitro/Vercel, and npm. Parsing, Zod, generated data, and tests are not implemented. [Data notes](../docs/data-notes.md) establish 202,176 intervals across about 7.9 MB of source files, with continuous UTC timestamps and unusual source offset transitions.
+The implementation uses TanStack Start, React, TypeScript, Nitro/Vercel, npm, Zod, and `csv-parse`. [Data notes](../docs/data-notes.md) establish 202,176 intervals across about 7.9 MB of source files, with continuous UTC timestamps and unusual source offset transitions.
 
 ## Decisions and rationale
 
@@ -72,12 +72,12 @@ Return only the selected window's hourly buckets, totals, quality, and determini
 
 ## Generated artifacts and deployment
 
-- Add `scripts/build-energy-data.ts`, run with `tsx`; add `csv-parse` and Zod when this plan is implemented. Use Vitest for pure domain/service tests and React Testing Library for the later interactive components; select versions compatible with the pinned Vite/React stack and commit the lockfile. Test files can live beside the module they verify.
+- `scripts/build-energy-data.ts` runs through `node --import tsx` and uses `csv-parse` plus Zod. Focused parser/domain/service checks live in `scripts/energy.test.ts`, using Node's built-in `node:test` with `tsx`; `npm test` runs them. This replaces the original Vitest/React Testing Library proposal to keep verification fast. UI checks are manual.
 - Generate `src/generated/energy/<dataset>.<hash>.json`, its `registry.server.ts`, and client-safe `src/generated/data-versions.ts` containing only dataset IDs, hashes, and coverage metadata. Keep generated outputs ignored by Git; retain immutable originals in `data/raw/`.
 - `dataVersion = SHA-256(raw bytes + parserVersion + schemaVersion + aggregationVersion)`, with explicit separators or canonical version serialization. Pin parser dependencies in the lockfile and bump the pipeline version for behavior changes.
 - Serialize deterministically: stable key/array order, no generation timestamp, random identifiers, or environment-dependent values. Publish a manifest only after all outputs validate; never reuse a partial generation.
 - Register literal JSON imports in `registry.server.ts` so the bundler includes artifacts in the server output. Protect the registry with a server-only boundary. Runtime services use the registry, never `fs.readFile` against the deployed repository.
-- Add a `data:build` script and invoke it from `predev`, `prebuild`, and `pretypecheck`; direct CI test entry points generate artifacts when needed. The generator may skip writes when versions and all expected outputs match.
+- `data:build` runs from `predev`, `prebuild`, `pretypecheck`, and `pretest`. A standalone `npm test` works on a fresh clone without manually generating artifacts. The generator skips unchanged writes.
 - The existing Vercel build must run generation before Vite/Nitro bundles the application. A cold function reconstructs results from bundled JSON without contacting another service or writing to ephemeral disk.
 
 TanStack loaders run on both server and client; keep data imports behind a server function handler calling a `.server.ts` service. Client-safe schemas and pure math stay outside that boundary. Verify isolation in the production client bundle. [Execution model](https://tanstack.com/start/latest/docs/framework/react/guide/execution-model)
@@ -96,7 +96,7 @@ TanStack loaders run on both server and client; keep data imports behind a serve
 | HTTP/CDN | Keep `Cache-Control: private, no-store` for dashboard HTML and dashboard/insight RPC responses; do not attach public cache headers in the loader. Normal hashed JS/CSS asset caching remains unchanged. |
 | LLM explanations | Browser-local reuse through localStorage, owned by plan 05; a matching entry avoids an explanation request. It does not control energy data availability. |
 
-Only `household`, `start`, and `end` affect fetching. URL `granularity` and `unit` affect local rendering; priority and slider movement must not refetch energy. Include the client manifest's version in loader dependencies and check the returned version; a deployment-version mismatch triggers one reload, then a recoverable update message rather than an infinite loop.
+Only `household`, `start`, and `end` affect fetching. URL `granularity` and `unit` affect local rendering; priority and slider movement must not refetch energy. The loader includes the client manifest's version and checks the returned version. A deployment-version mismatch shows recoverable feedback with a refresh action; this implementation deliberately avoids an automatic reload loop.
 
 Router caching is in memory and follows explicit loader dependencies; it does not make serverless responses durable or cache full HTML. SSR receives a fresh router per request and hydrates its selected data. Do not include preferences in an immutable energy result. [Router data loading](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading), [server functions](https://tanstack.com/start/latest/docs/framework/react/guide/server-functions)
 

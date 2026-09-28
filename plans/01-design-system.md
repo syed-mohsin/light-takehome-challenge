@@ -1,6 +1,6 @@
 # 01 — Design system setup
 
-Status: proposed implementation plan. Depends on the [shared decisions](README.md); enables plans 03–05.
+Status: implemented design record. Depends on the [shared decisions](README.md); enables plans 03–05. Tailwind tokens, shared primitives, the v0-inspired dashboard, and responsive chart frames are connected to real data. Desktop and 360px mobile smoke checks passed without page overflow; no heavy UI test suite was added.
 
 ## Objective
 
@@ -15,7 +15,7 @@ Turn the supplied v0 screenshots into a compact, reusable visual system for My E
 - Keep styles beside JSX. Component variants are finite maps of complete Tailwind class strings; do not construct dynamic utility names that scanning cannot discover. Use a class-name helper only where composition warrants it.
 - Extract components for recurring appearance or behavior, not every wrapper. Keep data retrieval, persistence, and calculations out of design primitives.
 
-## Token proposal
+## Design tokens
 
 Values below are starting design choices, to be verified in the browser rather than treated as sampled screenshot values.
 
@@ -50,7 +50,7 @@ Maintain this document order across breakpoints. Personalization changes the ban
 
 ## Component boundaries
 
-Proposed files are implementation targets, not files created by this planning change.
+The module map records the intended boundaries; implemented primitives are used by the dashboard rather than maintained as a separate component-gallery app.
 
 | Module | Responsibility / contract |
 | --- | --- |
@@ -86,7 +86,7 @@ Share formatting helpers for energy, money, dates, and percentages. The chart pl
 2. Build the button, card, field, segmented control, and status primitives alongside their first dashboard use. Add more primitives only when a concrete use requires them.
 3. Compose the dashboard shell with representative typed fixtures covering long labels, zero values, missing data, loading, and errors. Fixtures must be clearly separate from real data services.
 4. Implement metric and banner presentation using the agreed visual direction; connect containers only after these states are reviewable.
-5. Check desktop and mobile rendering, keyboard flow, and contrast. Use targeted component tests for behavior; do not snapshot every Tailwind class.
+5. Check desktop and mobile rendering, keyboard flow, and contrast manually in the browser; do not generate a heavy component suite or snapshot Tailwind classes.
 6. Remove obsolete scaffold selectors and temporary fixtures from the production path. Run the repository's formatting/lint, type, and production build checks.
 
 ## Acceptance criteria

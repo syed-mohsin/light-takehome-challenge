@@ -1,6 +1,6 @@
 # 03 — Onboarding and personalization
 
-Status: proposed implementation plan. Depends on the [design system](01-design-system.md) and shared schemas in the [plan index](README.md). Baseline metrics come from plan 02; plan 05 owns insight selection and explanation.
+Status: implemented design record. Depends on the [design system](01-design-system.md) and shared schemas in the [plan index](README.md). Saving money is the default, and the preference hook persists explicit choices/skip in localStorage without a server endpoint. Baseline metrics come from plan 02; plan 05 owns insight selection and explanation. Browser checks confirmed priority persistence after reload.
 
 ## Objective
 
@@ -74,9 +74,9 @@ Carbon remains an educational path before an emissions factor is chosen. Never r
 - `usePreference` owns the current priority, onboarding state, and readiness. localStorage persists the latest explicit choice or skip.
 - Chart/scenario state follows plan 04. Personalization observes typed inputs and invokes named actions rather than manipulating chart internals.
 
-| Proposed module | Responsibility |
+| Implemented module | Responsibility |
 | --- | --- |
-| `src/domain/preferences/schema.ts` | Strict stored-record schema and inferred types, importing the canonical priority schema |
+| `src/domain/preferences/schema.ts` | Canonical priority schema, strict stored-record schema, and inferred types |
 | `src/features/onboarding/use-preference.ts` | Read/validate once after mount, expose readiness and choose/skip actions, update local state and best-effort storage |
 | `src/features/onboarding/priority-selector.tsx` | Controlled accessible choices, introductory/compact presentation, and skip action |
 | `src/features/dashboard/dashboard-container.tsx` | Reserve the preference region during initialization; connect preference to banner and insight inputs |

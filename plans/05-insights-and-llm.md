@@ -1,6 +1,6 @@
 # 05 — Insights and LLM explanations
 
-Status: proposed implementation. Use Luna for optional explanations and localStorage for browser-side reuse; no database or shared cache service is required.
+Status: implemented design record. Deterministic insights, the Luna adapter, validated server responses, and bounded localStorage reuse are connected. No database or shared cache service is required. The disabled-AI fallback was checked in the browser; a paid Luna request and live grounding/latency review remain unverified without an API key.
 
 ## Objective and scope
 
@@ -17,7 +17,7 @@ Calculate over the selected inclusive source-local period. Use complete days and
 | Metric ID | Calculation and eligibility | Display/action |
 | --- | --- | --- |
 | `consumption.total` | Sum recorded consumption Wh. | Total and consumption-cost estimate. |
-| `consumption.peak-day` | Maximum complete daily total; earliest date breaks ties, disclose tied count. | Date and kWh; select that date in history. |
+| `consumption.peak-day` | Maximum complete daily total; earliest date breaks ties, disclose tied count. | Date and kWh; focus history while preserving the selected reporting range. |
 | `consumption.weekend-vs-weekday` | Separate mean daily Wh for Saturday/Sunday and Monday–Friday; at least two complete weeks and one day in each group. Relative change = `(weekendMean / weekdayMean - 1) * 100`, unavailable if denominator is zero. | Compare averages per day, never totals for unequal groups. |
 | `consumption.seasonality` | Mean daily Wh for December–February versus June–August. Require a complete contiguous winter and summer in the selected window; no partial-season comparison. | Seasonal pattern, without asserting heating type or weather causes. |
 | `consumption.evening-share` | Wh recorded at source-local hours `17 <= hour < 21`, divided by selected consumption Wh; unavailable if total is zero. | Highlight 5–9 PM in the typical-day chart. |
@@ -42,7 +42,7 @@ The shared `InsightFact` envelope contains `id`, `status: available | unavailabl
 | Insight cards | Baseline peak day and weekend/weekday comparison; add seasonality when eligible. “View data” selects the relevant chart view or opens the evidence table. |
 | Explanation card | Initially deterministic summary plus “Explain these patterns.” After mount, restore a valid matching localStorage explanation when available. Otherwise, the explicit action can request one. Display “AI explanation,” canonical evidence chips, and a controlled follow-up action. |
 
-Clicking a banner/insight action navigates or focuses the relevant section. It does not silently set a nonzero scenario. “Try an evening reduction” opens the existing slider with its current value.
+Clicking a banner/insight action navigates or focuses the relevant section. It does not silently set a nonzero scenario. “Try an evening reduction” opens the existing slider with its current value. The peak-day action focuses history rather than replacing the selected dates, keeping period-wide comparisons intact.
 
 ## Request and model output
 
@@ -87,7 +87,7 @@ The server returns a Zod-validated discriminated result: a `stale-data` variant 
 - `src/server/functions/insights.ts`: TanStack Start POST server function; validate input, call service, map validation/errors, set private/no-store response behavior.
 - `src/server/services/insights.server.ts`: load versioned summaries, recompute requested facts, choose fallback, call the provider, validate returned evidence, and emit result metadata.
 - `src/server/providers/openai.server.ts`: implement `InsightProvider.explain(input, signal): Promise<Explanation>`; keep SDK details and credentials here.
-- `src/domain/energy/insight-context.ts`: shared context-key helper and public explanation-version constant; no credentials or provider SDK imports.
+- `src/domain/insights/context.ts`: shared context-key helper and public explanation-version constant; no credentials or provider SDK imports. Shared request/result schemas and deterministic presentation live alongside it in `schema.ts` and `presentation.ts`.
 - `src/features/dashboard/insights-storage.ts`: a small localStorage read/write helper with Zod validation and bounded saved entries.
 - `src/features/dashboard/hooks/use-insights.ts`: cache lookup, explicit request lifecycle, current-context matching, and manual retry; presentational cards receive typed data/callbacks.
 
@@ -146,6 +146,6 @@ This cache saves repeat calls in the same browser. It is not a global spending l
 
 ## Open choices and deferred work
 
-Luna and browser-local persistence are selected. Deployment still needs API credentials; check grounding and latency on the fixture examples during implementation. Carbon-factor sourcing remains a separate product decision; this plan supports an explicit illustrative assumption only.
+Luna and browser-local persistence are implemented. Optional live explanations still need API credentials; check grounding and latency on the fixture examples before a live AI demo. Carbon-factor sourcing remains a separate product decision; this implementation supports an explicit illustrative assumption only.
 
 Defer chat, user-authenticated history, uploads, vector search, autonomous tool use, appliance recommendations, time-varying carbon factors, and automatic explanations on every interaction. Reconsider controlled template-only model output if qualitative grounding is not reliable enough in evaluation.

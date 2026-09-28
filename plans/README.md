@@ -1,6 +1,8 @@
 # Implementation plans
 
-Status: proposed implementation, ready for review. These documents describe future work; the current app is still the TanStack Start starter. Read [development guidance](../AGENTS.md) and [verified data notes](../docs/data-notes.md) alongside them.
+Status: all five plans implemented. These documents now serve as design records; their detailed acceptance items remain review criteria rather than a claim that every item has an automated test. Read [development guidance](../AGENTS.md), [run/demo instructions](../README.md), and [verified data notes](../docs/data-notes.md) alongside them.
+
+Implementation notes: the CSV/domain checks use eight fast Node `node:test` tests through `tsx` (about one second); UI behavior is reviewed manually rather than adding a heavy component suite. Lint, type checking, and the Vercel build pass. Desktop/mobile browser smoke checks are complete; hosting and a paid Luna call remain unverified without deployment/API configuration. Dataset-version mismatches offer a refresh instead of forcing a reload, and the peak-day action focuses history without replacing the selected date range. No database or Redis was added.
 
 The goal is a coherent 30-minute demo: choose an example household and priority, understand its historical electricity use, try a reduction scenario, and request a grounded explanation. The supplied v0 screenshots set the visual direction. Their numbers and claims are illustrative, and source code has not been supplied.
 
@@ -36,7 +38,7 @@ The initial UI has one selected household and a daily/weekly history chart. A ty
 
 ## Shared contracts
 
-These TypeScript sketches document the agreed shapes. Implementation must define runtime boundaries with Zod and infer the corresponding types; the sketches are not additional application types to maintain.
+These TypeScript sketches document the agreed shapes. Runtime boundaries are defined with Zod and inferred types in the implementation; the sketches are not additional application types to maintain.
 
 ```ts
 type DatasetId = 'low-winter' | 'high-winter' | 'solar'
@@ -84,7 +86,7 @@ Explicit Explain action -> localStorage lookup -> reuse matching explanation
 
 The frontend and server can import `src/domain/energy/` for pure schemas and calculations. That directory must not depend on React, filesystem APIs, provider SDKs, or secrets. Server services own orchestration and external access; hooks own UI state and call boundaries. Group UI code by feature and place genuinely shared primitives in `src/components/ui/`.
 
-Planned locations:
+Implemented locations:
 
 | Location | Responsibility |
 | --- | --- |
@@ -114,10 +116,10 @@ AI result caching is separate from dataset caching. Plan 05 uses a small, bounde
 
 Keep each slice reviewable and record any changed design decision in the owning plan and this index when it affects shared contracts. Install only the dependencies needed for the active slice. Pin and verify package versions against the existing Node 22/TanStack/Vite scaffold; code examples in current documentation can differ from the installed API.
 
-## Decisions intentionally left for implementation
+## Remaining configuration and deferred decisions
 
 - **v0 source:** screenshots suffice to implement the direction; a source export would allow evaluation of reusable components. Do not assume framework-specific v0 code is already available.
-- **LLM credentials and validation:** Luna is selected; configure its server-side API key and check quality/latency on the documented example facts. Core features do not need an API key.
+- **LLM credentials and validation:** the Luna adapter is implemented; configure its server-side API key and check live quality/latency on the documented example facts. No paid provider request has been verified. Core features do not need an API key.
 - **Carbon factor and meter semantics:** use the conservative behavior described above until a factor or clearer source definition is supplied. These uncertainties do not block consumption charts or the reduction scenario.
 - **Hosting:** Vercel configuration and local production validation exist; the Vercel project and optional AI environment settings still need setup during deployment work. No cache service is required.
 

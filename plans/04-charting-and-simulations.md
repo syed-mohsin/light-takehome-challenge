@@ -1,6 +1,6 @@
 # 04 — Charting and simulations
 
-Status: proposed implementation. Depends on [design system](01-design-system.md), [energy data](02-csv-parsing-and-caching.md), and the shared contracts in [README](README.md). Supplies scenario facts to [insights](05-insights-and-llm.md).
+Status: implemented design record. Depends on [design system](01-design-system.md), [energy data](02-csv-parsing-and-caching.md), and the shared contracts in [README](README.md). Recharts history/profile views, household/date controls, units, the data table, and shared simulation math are connected. Fast domain tests verify reconciliation and scenario invariants. Manual checks covered daily/weekly retention, household reset, solar/dollars, typical-day view, keyboard controls, custom dates, and partial-week tables.
 
 ## Outcome and product direction
 
@@ -10,7 +10,7 @@ Start with one selected example household and one reporting period, not three ov
 
 ## Library and rendering decisions
 
-Use Recharts for React composition, SVG rendering, responsive sizing, line overlays, bars, and keyboard exploration. Install a current stable compatible version and pin it through the lockfile; charting is not installed in the scaffold yet. Use supported public props, not chart-internal state.
+Use Recharts for React composition, SVG rendering, responsive sizing, line overlays, bars, and keyboard exploration. The installed version is pinned through the lockfile. Use supported public props, not chart-internal state.
 
 - Main history: `LineChart` with linear baseline and dashed scenario series, zero-based y-axis, grid, readable date ticks, and shared tooltip. Daily totals are the default; weekly totals reduce visual density when selected.
 - Typical day: a 24-slot `ComposedChart` with reported hourly consumption bars and an optional scenario line. Shade the 5–9 PM intervention window and expose the same explanation in text.
@@ -120,7 +120,7 @@ Keep Recharts' accessibility support enabled and verify keyboard point navigatio
 3. Add the profile view and clear denominator/offset explanations.
 4. Add scenario controls, the second series, period savings summary, and banner action.
 5. Connect committed scenarios to the insights flow; verify stale results never replace current context.
-6. Run formatting, type checks, domain/component tests, production build, and responsive/keyboard inspection.
+6. Run formatting, type checks, the fast shared domain tests, production build, and manual responsive/keyboard inspection. No heavy component test suite is included.
 
 Acceptance requires a working daily/weekly chart for each supplied CSV, exact reconciliation to the data-service totals, and a historical label instead of “Now.” Test partial weeks, year boundaries, all/weekday/weekend filtering, zero usage, missing values, source-offset changes, and USD/kWh formatting.
 
