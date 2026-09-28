@@ -5,6 +5,11 @@ import type {
   EnergyWindow,
   Scenario,
 } from '../../../domain/energy/schema'
+import { calculateAnalogies } from '../../../domain/insights/analogies'
+import {
+  analogyOptions,
+  renderAnalogy,
+} from '../../../domain/insights/analogy-presentation'
 import { insightContextKey } from '../../../domain/insights/context'
 import {
   deterministicExplanation,
@@ -84,6 +89,10 @@ export function useInsights({
     () => deterministicExplanation(request, facts),
     [request, facts],
   )
+  const analogies = useMemo(
+    () => analogyOptions(calculateAnalogies(window, request.scenario)),
+    [window, request.scenario],
+  )
   const [view, setView] = useState<ViewState>({
     key: '',
     status: 'idle',
@@ -94,7 +103,7 @@ export function useInsights({
 
   useEffect(() => {
     if (!preferenceReady) return
-    const stored = readSavedExplanation(key, facts, request)
+    const stored = readSavedExplanation(key, facts, request, analogies)
     setView({
       key,
       status: stored ? 'ready' : 'idle',
@@ -105,11 +114,11 @@ export function useInsights({
       controller.current?.abort()
       controller.current = null
     }
-  }, [key, preferenceReady, facts, request])
+  }, [key, preferenceReady, facts, request, analogies])
 
   async function explain() {
     if (!preferenceReady || controller.current) return
-    const stored = readSavedExplanation(key, facts, request)
+    const stored = readSavedExplanation(key, facts, request, analogies)
     if (stored) {
       setView({
         key,
@@ -133,7 +142,12 @@ export function useInsights({
         return
       }
       if (result.source === 'ai' && result.status === 'ready') {
-        const explanation = validExplanation(result.explanation, facts, request)
+        const explanation = validExplanation(
+          result.explanation,
+          facts,
+          request,
+          analogies,
+        )
         if (!explanation) {
           setView({
             key,
@@ -175,6 +189,7 @@ export function useInsights({
   return {
     facts,
     explanation: current?.explanation ?? fallback,
+    analogy: renderAnalogy(current?.explanation?.analogy ?? null, analogies),
     isAi: current?.status === 'ready' && Boolean(current.explanation),
     cached: current?.cached ?? false,
     status: current?.status ?? 'idle',

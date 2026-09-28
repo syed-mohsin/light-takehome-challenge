@@ -1,5 +1,7 @@
 import { formatDate, formatEnergy } from '../energy/format'
 import type { InsightFact } from '../energy/schema'
+import type { EnergyAnalogy } from './analogies'
+import { validAnalogy } from './analogy-presentation'
 import {
   type Explanation,
   ExplanationSchema,
@@ -88,6 +90,7 @@ export function validExplanation(
   value: unknown,
   facts: InsightFact[],
   request: InsightRequest,
+  comparisons: EnergyAnalogy[],
 ): Explanation | null {
   const parsed = ExplanationSchema.safeParse(value)
   if (!parsed.success) return null
@@ -98,10 +101,13 @@ export function validExplanation(
   const text = [
     explanation.title,
     ...explanation.paragraphs.map((paragraph) => paragraph.text),
+    explanation.analogy?.template ?? '',
   ].join(' ')
   // Numbers belong to canonical evidence chips, never model-authored prose.
   if (
     /\p{N}/u.test(text) ||
+    facts.some((fact) => text.includes(fact.id)) ||
+    !validAnalogy(explanation.analogy, comparisons) ||
     !availableActions(request).includes(explanation.actionId)
   )
     return null
@@ -127,6 +133,7 @@ export function deterministicExplanation(
     if (has('scenario.carbon-equivalent'))
       return {
         title: 'A scenario, with an explicit assumption',
+        analogy: null,
         paragraphs: [
           {
             text: 'Your selected evening reduction implies a lower consumption-equivalent footprint under your chosen factor. This is a hypothetical estimate, not a measurement of emissions avoided.',
@@ -140,6 +147,7 @@ export function deterministicExplanation(
       }
     return {
       title: 'Start with the energy you can see',
+      analogy: null,
       paragraphs: [
         {
           text: request.carbonAssumption
@@ -155,6 +163,7 @@ export function deterministicExplanation(
   }
   if (request.priority === 'money')
     return {
+      analogy: null,
       title:
         request.scenario.reductionPercent > 0
           ? 'Small changes, visible savings'
@@ -180,6 +189,7 @@ export function deterministicExplanation(
     }
   return {
     title: 'Every day tells part of the story',
+    analogy: null,
     paragraphs: [
       {
         text: has('consumption.weekend-vs-weekday')

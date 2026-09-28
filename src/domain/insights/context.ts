@@ -1,7 +1,7 @@
 import type { InsightRequest } from './schema'
 
 // Bump when the prompt, model, metrics, tariff, or scenario rules change.
-export const EXPLANATION_VERSION = 'energy-explainer-v1'
+export const EXPLANATION_VERSION = 'energy-explainer-v2-analogies'
 
 export function insightContextKey(request: InsightRequest): string {
   return JSON.stringify([

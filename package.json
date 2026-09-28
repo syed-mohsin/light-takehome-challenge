@@ -19,7 +19,7 @@
     "pretypecheck": "npm run data:build",
     "typecheck": "npm run generate-routes && tsc --noEmit",
     "pretest": "npm run data:build",
-    "test": "node --import tsx --test scripts/energy.test.ts",
+    "test": "node --import tsx --test scripts/*.test.ts",
     "build:vercel": "NITRO_PRESET=vercel npm run build",
     "start": "node .output/server/index.mjs"
   },

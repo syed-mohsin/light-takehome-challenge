@@ -20,6 +20,7 @@ import {
 import type { InsightAction } from '../../../domain/insights/schema'
 import type { Priority } from '../../../domain/preferences/schema'
 import { type InsightStatus, useInsights } from '../hooks/use-insights'
+import { EnergyAnalogy } from './energy-analogy'
 
 const statusMessages: Partial<Record<InsightStatus, string>> = {
   loading: 'Explaining your selected data…',
@@ -42,7 +43,7 @@ export function InsightsSection(props: {
   onAction: (action: InsightAction) => void
   onRefresh: () => void
 }) {
-  const { facts, explanation, isAi, cached, status, explain } =
+  const { facts, explanation, analogy, isAi, cached, status, explain } =
     useInsights(props)
   const evidenceIds = new Set(
     explanation.paragraphs.flatMap((paragraph) => paragraph.evidenceIds),
@@ -111,6 +112,7 @@ export function InsightsSection(props: {
               </h3>
             </div>
           </div>
+          {isAi && analogy && <EnergyAnalogy {...analogy} />}
           <div className="mt-5 space-y-3 text-sm leading-relaxed text-ink">
             {explanation.paragraphs.map((paragraph) => (
               <p key={paragraph.text}>{paragraph.text}</p>

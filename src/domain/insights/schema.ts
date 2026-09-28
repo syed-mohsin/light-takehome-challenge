@@ -8,6 +8,7 @@ import {
   ScenarioSchema,
 } from '../energy/schema'
 import { PrioritySchema } from '../preferences/schema'
+import { AnalogyIdSchema } from './analogies'
 
 export { MetricIdSchema } from '../energy/schema'
 
@@ -35,6 +36,10 @@ export const InsightRequestSchema = z
 export const ExplanationWireSchema = z
   .object({
     title: z.string(),
+    analogy: z
+      .object({ id: AnalogyIdSchema, template: z.string() })
+      .strict()
+      .nullable(),
     paragraphs: z
       .array(
         z
@@ -52,6 +57,13 @@ export const ExplanationWireSchema = z
 
 export const ExplanationSchema = ExplanationWireSchema.extend({
   title: z.string().trim().min(1).max(80),
+  analogy: z
+    .object({
+      id: AnalogyIdSchema,
+      template: z.string().trim().min(1).max(320),
+    })
+    .strict()
+    .nullable(),
   paragraphs: z
     .array(
       z

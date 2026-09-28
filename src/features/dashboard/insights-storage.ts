@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { InsightFact } from '../../domain/energy/schema'
+import type { EnergyAnalogy } from '../../domain/insights/analogies'
 import { validExplanation } from '../../domain/insights/presentation'
 import {
   ExplanationSchema,
@@ -38,11 +39,15 @@ export function readSavedExplanation(
   contextKey: string,
   facts: InsightFact[],
   request: InsightRequest,
+  comparisons: EnergyAnalogy[],
 ): SavedExplanation | null {
   const entry = readEntries().find(
     (candidate) => candidate.contextKey === contextKey,
   )
-  if (!entry || !validExplanation(entry.explanation, facts, request))
+  if (
+    !entry ||
+    !validExplanation(entry.explanation, facts, request, comparisons)
+  )
     return null
   return entry
 }

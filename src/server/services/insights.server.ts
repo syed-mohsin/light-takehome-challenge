@@ -1,4 +1,6 @@
 import { calculateFacts } from '../../domain/energy/facts'
+import { calculateAnalogies } from '../../domain/insights/analogies'
+import { analogyOptions } from '../../domain/insights/analogy-presentation'
 import { insightContextKey } from '../../domain/insights/context'
 import {
   availableActions,
@@ -35,6 +37,7 @@ export async function explainEnergy(
   }
   const canonical = { ...input, expectedDataVersion: window.dataVersion }
   const facts = calculateFacts(window, input.scenario, input.carbonAssumption)
+  const analogies = analogyOptions(calculateAnalogies(window, input.scenario))
   const fallback = {
     kind: 'content' as const,
     contextKey: insightContextKey(canonical),
@@ -64,10 +67,11 @@ export async function explainEnergy(
             evidence: factEvidence(fact),
           })),
         availableActions: availableActions(canonical),
+        analogies,
       },
       deadline,
     )
-    const explanation = validExplanation(output, facts, canonical)
+    const explanation = validExplanation(output, facts, canonical, analogies)
     if (!explanation)
       throw new InvalidModelOutputError('Unsupported explanation content')
     return InsightResultSchema.parse({
