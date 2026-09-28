@@ -20,17 +20,25 @@
   "dependencies": {
     "@tanstack/react-router": "1.170.40",
     "@tanstack/react-start": "1.168.59",
+    "csv-parse": "^7.0.3",
+    "lucide-react": "^1.48.0",
     "nitro": "3.0.260610-beta",
+    "openai": "^7.23.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "recharts": "^3.10.1",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.5",
+    "@tailwindcss/vite": "^4.3.3",
     "@tanstack/router-cli": "^1.132.0",
     "@types/node": "^22.10.2",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^6.0.1",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.2",
     "vite": "^8.0.0"
   },
