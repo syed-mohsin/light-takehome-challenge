@@ -17,11 +17,7 @@ import {
 } from '../../../domain/insights/schema'
 import type { Priority } from '../../../domain/preferences/schema'
 import { getEnergyExplanation } from '../../../server/functions/insights'
-import {
-  readSavedExplanation,
-  type SavedExplanation,
-  saveExplanation,
-} from '../insights-storage'
+import { readSavedExplanation, saveExplanation } from '../insights-storage'
 
 export type InsightStatus =
   | 'idle'
@@ -94,53 +90,44 @@ export function useInsights({
     explanation: null,
     cached: false,
   })
-  const sequence = useRef(0)
-  const activeKey = useRef(key)
-  const pending = useRef<string | null>(null)
   const controller = useRef<AbortController | null>(null)
-  const memory = useRef(new Map<string, SavedExplanation>())
-  activeKey.current = key
 
   useEffect(() => {
-    sequence.current += 1
-    pending.current = null
     if (!preferenceReady) return
-    const stored =
-      memory.current.get(key) ?? readSavedExplanation(key, facts, request)
-    const valid = stored && validExplanation(stored.explanation, facts, request)
+    const stored = readSavedExplanation(key, facts, request)
     setView({
       key,
-      status: valid ? 'ready' : 'idle',
-      explanation: valid || null,
-      cached: Boolean(valid),
+      status: stored ? 'ready' : 'idle',
+      explanation: stored?.explanation ?? null,
+      cached: Boolean(stored),
     })
     return () => {
-      sequence.current += 1
       controller.current?.abort()
+      controller.current = null
     }
   }, [key, preferenceReady, facts, request])
 
   async function explain() {
-    if (!preferenceReady || pending.current === key) return
-    const stored =
-      memory.current.get(key) ?? readSavedExplanation(key, facts, request)
-    const valid = stored && validExplanation(stored.explanation, facts, request)
-    if (valid) {
-      setView({ key, status: 'ready', explanation: valid, cached: true })
+    if (!preferenceReady || controller.current) return
+    const stored = readSavedExplanation(key, facts, request)
+    if (stored) {
+      setView({
+        key,
+        status: 'ready',
+        explanation: stored.explanation,
+        cached: true,
+      })
       return
     }
 
-    const requestId = ++sequence.current
-    controller.current?.abort()
     const abort = new AbortController()
     controller.current = abort
-    pending.current = key
     setView({ key, status: 'loading', explanation: null, cached: false })
     try {
       const result = InsightResultSchema.parse(
         await getEnergyExplanation({ data: request, signal: abort.signal }),
       )
-      if (requestId !== sequence.current || activeKey.current !== key) return
+      if (abort.signal.aborted) return
       if (result.kind === 'stale-data' || result.contextKey !== key) {
         setView({ key, status: 'stale-data', explanation: null, cached: false })
         return
@@ -156,18 +143,11 @@ export function useInsights({
           })
           return
         }
-        const entry = {
+        saveExplanation({
           contextKey: key,
           explanation,
           generatedAt: result.generatedAt,
-        }
-        memory.current.delete(key)
-        memory.current.set(key, entry)
-        if (memory.current.size > 10) {
-          const oldest = memory.current.keys().next().value
-          if (oldest !== undefined) memory.current.delete(oldest)
-        }
-        saveExplanation(entry)
+        })
         setView({ key, status: 'ready', explanation, cached: false })
       } else {
         setView({
@@ -178,7 +158,7 @@ export function useInsights({
         })
       }
     } catch {
-      if (requestId === sequence.current && activeKey.current === key) {
+      if (!abort.signal.aborted) {
         setView({
           key,
           status: 'unavailable',
@@ -187,7 +167,7 @@ export function useInsights({
         })
       }
     } finally {
-      if (requestId === sequence.current) pending.current = null
+      if (controller.current === abort) controller.current = null
     }
   }
 

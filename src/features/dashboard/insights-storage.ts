@@ -64,6 +64,6 @@ export function saveExplanation(entry: SavedExplanation): void {
       }),
     )
   } catch {
-    // The hook retains a successful explanation for this visit when storage fails.
+    // The current explanation stays visible even when it cannot be saved.
   }
 }
