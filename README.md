@@ -1,5 +1,7 @@
 # My Energy Story
 
+**Live demo:** [light-takehome-challenge.vercel.app](https://light-takehome-challenge.vercel.app)
+
 Light take-home challenge, option 1: an electricity dashboard built with TanStack Start, React, TypeScript, Tailwind, and Recharts. Explore three supplied households, understand their historical usage, and try an evening-reduction scenario.
 
 The five implementation plans are implemented. The app works without API credentials or a database. Lint, TypeScript, the focused data tests, standalone/Vercel production builds, and manual browser smoke checks have passed. Live local Luna explanations and browser-cache reuse have been verified with an API key. A hosted deployment has not been verified here.
